@@ -1,0 +1,9 @@
+{
+  "model_type": "broad_unet",
+  "horizon": "all",
+  "parameters": 10639425,
+  "epochs_completed": 4,
+  "best_val_loss": 2.1487319469451904,
+  "training_duration_sec": 1074.526302099228,
+  "checkpoint_path": "/Users/agamghotra/Desktop/Final Datasets/Broad-UNet/outputs/multi_horizon/best_broad_unet_all.keras"
+}

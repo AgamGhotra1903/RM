@@ -1,0 +1,26 @@
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# macOS system files
+.DS_Store
+._*
+
+# Large Model Checkpoints (>100MB exceeds GitHub limits)
+*.keras
+*.h5
+*.ckpt
+*.pt
+*.pth
+
+# Large Dataset Formats
+*.nc
+*.grib
+*.hdf5

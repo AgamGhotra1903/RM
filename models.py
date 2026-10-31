@@ -144,7 +144,7 @@ def UNet_AsymmetricInceptionRes3DDR(lags, latitude, longitude, features, feature
 def broad_UNet(lags, latitude, longitude, features, features_output, filters, dropout, kernel_init=tf.keras.initializers.GlorotUniform(seed=50)):    
 
     def image_level_feature_pooling(x, f):
-        up_size = x.get_shape().as_list()[2:4]
+        up_size = x.shape[2:4] if hasattr(x, 'shape') else x.get_shape().as_list()[2:4]
         x = GlobalAveragePooling3D()(x)
         x = Reshape((1, 1, 1, f))(x)
         x = UpSampling3D(size = (1,up_size[0],up_size[1]))(x)
