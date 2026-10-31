@@ -1,0 +1,16 @@
+Experiment_ID,Description,Parameters,Mean_Val_RMSE_K,Mean_Skill_vs_Pers,Diff_vs_L0_K,Pct_Improvement,Outcome_Classification,H1_RMSE,H2_RMSE,H4_RMSE,H8_RMSE,H12_RMSE,H24_RMSE,H36_RMSE
+L11_after_skip_fusion,Post-Skip KAN Fusion at Merge6 & Merge7,10254583,3.427,0.024,-0.093,2.63,Slight Improvement,2.021,3.327,5.163,5.263,2.145,2.839,3.232
+L9_kan_then_mlp,Sequential KAN -> MLP After ASPP,11300599,3.448,0.025,-0.072,2.05,Slight Improvement,1.887,3.273,5.208,5.511,2.214,2.791,3.248
+L5_mlp_after_aspp,MLP Bottleneck Processing After ASPP,10906615,3.47,0.012,-0.049,1.4,Slight Improvement,2.072,3.5,5.254,5.252,2.131,2.816,3.268
+L4_mlp_before_aspp,MLP Bottleneck Processing Before ASPP,10906615,3.476,0.012,-0.043,1.23,Slight Improvement,2.073,3.391,5.249,5.379,2.132,2.837,3.274
+L2_conv_before_aspp,Additional Conv3D Processing Before ASPP,11233015,3.481,0.01,-0.039,1.1,Slight Improvement,2.089,3.491,5.353,5.211,2.123,2.812,3.286
+L8_mlp_then_kan,Sequential MLP -> KAN After ASPP,11300599,3.483,0.01,-0.037,1.04,Slight Improvement,2.074,3.467,5.26,5.375,2.143,2.803,3.259
+L6_kan_before_aspp,KAN Bottleneck Processing Before ASPP,11036919,3.487,0.013,-0.032,0.92,No Meaningful Difference,2.019,3.417,5.318,5.458,2.143,2.791,3.265
+L1_conv_rearrangement,MultiScale Before Conv3D in Encoder,9859651,3.497,0.006,-0.023,0.65,No Meaningful Difference,2.072,3.53,5.234,5.388,2.152,2.812,3.288
+L10_before_skip_fusion,Pre-Skip Fusion Processing on Encoder Features,10663607,3.497,0.011,-0.023,0.65,No Meaningful Difference,1.996,3.424,5.41,5.412,2.143,2.827,3.267
+L3_conv_after_aspp,Additional Conv3D Processing After ASPP,12412663,3.503,0.004,-0.016,0.47,No Meaningful Difference,2.12,3.314,5.235,5.512,2.13,2.914,3.297
+L12_encoder_rearrangement,Encoder Conv -> BatchNorm -> ReLU Ordering,10649655,3.503,0.003,-0.017,0.48,No Meaningful Difference,2.133,3.587,5.324,5.298,2.133,2.795,3.248
+L14_best_combined_arrangement,Best Combined Architecture (Norm-Act + Pre-ASPP + KAN-Skips),10851383,3.506,0.001,-0.014,0.4,No Meaningful Difference,2.137,3.5,5.32,5.311,2.194,2.803,3.275
+L0_original,Original Broad-UNet Reference,10642935,3.52,0.001,0.0,-0.0,No Meaningful Difference,2.131,3.55,5.381,5.411,2.124,2.795,3.245
+L13_decoder_rearrangement,Decoder Convolution Before UpSampling,11585207,3.533,-0.005,0.014,-0.39,No Meaningful Difference,2.162,3.545,5.284,5.465,2.141,2.831,3.305
+L7_kan_after_aspp,KAN Bottleneck Processing After ASPP,11036919,3.535,-0.003,0.015,-0.44,No Meaningful Difference,2.136,3.54,5.411,5.44,2.146,2.813,3.259

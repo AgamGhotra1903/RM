@@ -43,3 +43,4 @@ def test_all_15_rearranged_architectures_shape(exp_id):
     assert output.shape == (2, 1, 32, 48, 7), (
         f"Architecture {exp_id} output shape mismatch: {output.shape} != (2, 1, 32, 48, 7)"
     )
+

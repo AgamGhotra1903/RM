@@ -1,0 +1,26 @@
+description: Additional Conv3D Processing After ASPP
+experiment_id: L3_conv_after_aspp
+horizons:
+- 1
+- 2
+- 4
+- 8
+- 12
+- 24
+- 36
+lead_hours:
+- 2
+- 4
+- 8
+- 16
+- 24
+- 48
+- 72
+training:
+  batch_size: 4
+  epochs: 2
+  learning_rate: 0.0003
+  loss: rebalanced_7horizon_loss
+  optimizer: adam
+  steps_per_epoch: 10
+  val_steps: 3
