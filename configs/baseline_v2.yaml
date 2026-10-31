@@ -1,0 +1,69 @@
+# configs/baseline_v2.yaml
+# Master Configuration for Phase 2: Stronger Baseline (Baseline v2)
+# Configured for CPU hardware exploration budget.
+
+experiment:
+  name: "baseline_v2"
+  run_id: "baseline_v2_ablated"
+  seed: 42
+  description: "Phase 2 Stronger Baseline with Residual Prediction, Cyclical Temporal Encodings, and Rebalanced Loss"
+
+paths:
+  data_dir: "~/ERA5_Radiation/final"
+  outputs_dir: "outputs"
+  results_dir: "results"
+
+data:
+  lags: 6
+  horizons: [1, 2, 4, 8, 12, 24, 36]
+  lead_hours: [2, 4, 8, 16, 24, 48, 72]
+  train_years: [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+  val_years: [2022, 2023]
+  test_years: [2024, 2025]
+  input_variables: ["t2m", "d2m", "msl", "sp", "slhf", "ssr"]
+  target_variable: "t2m"
+  spatial_shape: [28, 34]
+  padded_shape: [32, 48]
+  pad_lat: [2, 2]
+  pad_lon: [7, 7]
+
+model:
+  name: "broad_unet_v2"
+  base_filters: 16
+  dropout_rate: 0.2
+  input_history: 6
+  dim_model: "3d"
+  num_horizons: 7
+
+ablations:
+  # Exploration budget tuned for CPU execution:
+  budget_epochs: 3
+  steps_per_epoch: 12
+  val_steps: 4
+
+  # S1: Residual Prediction: T_{t+h} = T_{t_0} + Delta T
+  residual_head: true
+
+  # S2: Cyclical Temporal Coordinates: sin/cos hour-of-day, sin/cos day-of-year
+  cyclical_time: true
+  num_cyclical_channels: 4
+
+  # S3: Loss Rebalancing: weighted MSE by inverse persistence variance (1 / sigma_pers^2)
+  loss_rebalancing: true
+  # Inverse persistence variance weights derived from empirical Train/Val baselines:
+  # H1: 1.795, H2: 0.600, H4: 0.255, H8: 0.283, H12: 2.067
+
+  # S4: Static Terrain Elevation (surface geopotential)
+  static_terrain: false
+
+training:
+  batch_size: 4
+  learning_rate: 3.0e-4
+  min_learning_rate: 1.0e-6
+  warmup_epochs: 1
+  epochs: 3
+  patience: 2
+  optimizer: "adamw"
+  weight_decay: 1.0e-4
+  clipnorm: 1.0
+  shuffle_buffer: true

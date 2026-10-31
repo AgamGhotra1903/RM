@@ -24,3 +24,4 @@ __pycache__/
 *.nc
 *.grib
 *.hdf5
+*.npz

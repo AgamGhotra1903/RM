@@ -1,0 +1,89 @@
+ablations:
+  budget_epochs: 3
+  cyclical_time: true
+  loss_rebalancing: true
+  num_cyclical_channels: 4
+  residual_head: true
+  static_terrain: false
+  steps_per_epoch: 12
+  val_steps: 4
+data:
+  horizons:
+  - 1
+  - 2
+  - 4
+  - 8
+  - 12
+  input_variables:
+  - t2m
+  - d2m
+  - msl
+  - sp
+  - slhf
+  - ssr
+  lags: 6
+  lead_hours:
+  - 2
+  - 4
+  - 8
+  - 16
+  - 24
+  pad_lat:
+  - 2
+  - 2
+  pad_lon:
+  - 7
+  - 7
+  padded_shape:
+  - 32
+  - 48
+  spatial_shape:
+  - 28
+  - 34
+  target_variable: t2m
+  test_years:
+  - 2024
+  - 2025
+  train_years:
+  - 2011
+  - 2012
+  - 2013
+  - 2014
+  - 2015
+  - 2016
+  - 2017
+  - 2018
+  - 2019
+  - 2020
+  - 2021
+  val_years:
+  - 2022
+  - 2023
+experiment:
+  description: Phase 2 Stronger Baseline with Residual Prediction, Cyclical Temporal
+    Encodings, and Rebalanced Loss
+  name: baseline_v2
+  run_id: baseline_v2_ablated
+  seed: 42
+model:
+  base_filters: 16
+  dim_model: 3d
+  dropout_rate: 0.2
+  input_history: 6
+  name: broad_unet_v2
+  num_horizons: 5
+paths:
+  data_dir: ~/ERA5_Radiation/final
+  outputs_dir: outputs
+  results_dir: results
+training:
+  batch_size: 4
+  clipnorm: 1.0
+  epochs: 3
+  learning_rate: 0.0003
+  min_learning_rate: 1.0e-06
+  optimizer: adamw
+  patience: 2
+  shuffle_buffer: true
+  warmup_epochs: 1
+  weight_decay: 0.0001

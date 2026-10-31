@@ -3,6 +3,7 @@ scripts/era5_data.py
 ====================
 Data management, normalization, padding, and Sequence generator for ERA5 weather forecasting.
 Ensures 100% strict non-leakage chronological partitions and zero data snooping.
+Supports cyclical temporal encodings (sin/cos hour, sin/cos DOY) and terrain elevation features.
 """
 
 import sys
@@ -171,8 +172,11 @@ class ERA5DataManager:
 class ERA5Sequence(tf.keras.utils.Sequence):
     """
     Keras Sequence generator delivering mini-batches of:
-    - Inputs: (batch, 6, 32, 48, 6) for 3D Broad-UNet or (batch, 32, 48, 36) for 2D UNet
-    - Targets: (batch, 1, 32, 48, 1) for single horizon, or (batch, 1, 32, 48, 5) for multi-horizon
+    - Inputs: (batch, 6, 32, 48, C_in) for 3D Broad-UNet or (batch, 32, 48, 6*C_in) for 2D UNet
+    - Targets: (batch, 1, 32, 48, num_horizons)
+    Supports:
+    - include_cyclical_time: adds sin/cos hour-of-day and sin/cos day-of-year (+4 channels)
+    - include_terrain: adds normalized ln(msl / sp) surface geopotential proxy (+1 channel)
     """
     def __init__(
         self,
@@ -183,6 +187,8 @@ class ERA5Sequence(tf.keras.utils.Sequence):
         batch_size: int = config.BATCH_SIZE,
         dim_model: str = "3d",
         norm_method: str = config.NORM_METHOD,
+        include_cyclical_time: bool = False,
+        include_terrain: bool = False,
         shuffle: bool = False,
         seed: int = 42
     ):
@@ -190,10 +196,12 @@ class ERA5Sequence(tf.keras.utils.Sequence):
         self.dm = data_manager
         self.years = years
         self.norm_stats = norm_stats
-        self.horizon = horizon  # Specific horizon step, or None for multi-horizon
+        self.horizon = horizon
         self.batch_size = batch_size
         self.dim_model = dim_model
         self.norm_method = norm_method
+        self.include_cyclical_time = include_cyclical_time
+        self.include_terrain = include_terrain
         self.shuffle = shuffle
         self.seed = seed
         
@@ -234,18 +242,17 @@ class ERA5Sequence(tf.keras.utils.Sequence):
         y_batch = []
         
         for w_idx in batch_window_indices:
-            y, start_i, _, _ = self.windows[w_idx]
+            y, start_i, input_end_t, _ = self.windows[w_idx]
             year_arr = self.dm.get_year_data(y)
             
             # Slice input frames: (6, 28, 34, 6)
             x_raw = year_arr[start_i : start_i + self.lags].copy()
             
-            # Slice target frames: shape (num_horizons, 28, 34, 1)
+            # Slice target frames: shape (1, 28, 34, len(horizons))
             y_raw_list = []
             for h in self.horizons:
                 target_idx = start_i + self.lags + h - 1
                 y_raw_list.append(year_arr[target_idx : target_idx + 1, :, :, config.TARGET_INDEX : config.TARGET_INDEX + 1])
-            # Concatenate along channel axis: shape (1, 28, 34, len(horizons))
             y_raw = np.concatenate(y_raw_list, axis=-1)
             
             # Normalize inputs using training statistics
@@ -259,6 +266,36 @@ class ERA5Sequence(tf.keras.utils.Sequence):
                     v_min = self.norm_stats[var_name]["min"]
                     v_range = self.norm_stats[var_name]["range"]
                     x_norm[..., c_idx] = (x_raw[..., c_idx] - v_min) / v_range
+
+            extra_channels = []
+            # S2: Cyclical time encodings: sin/cos hour-of-day, sin/cos day-of-year
+            if self.include_cyclical_time:
+                h_val = input_end_t.hour
+                d_val = input_end_t.dayofyear
+                h_sin = np.sin(2.0 * np.pi * h_val / 24.0)
+                h_cos = np.cos(2.0 * np.pi * h_val / 24.0)
+                d_sin = np.sin(2.0 * np.pi * d_val / 365.25)
+                d_cos = np.cos(2.0 * np.pi * d_val / 365.25)
+                # Broadcast across (lags, 28, 34, 4)
+                time_feats = np.zeros((self.lags, config.ORIGINAL_LAT, config.ORIGINAL_LON, 4), dtype=np.float32)
+                time_feats[..., 0] = h_sin
+                time_feats[..., 1] = h_cos
+                time_feats[..., 2] = d_sin
+                time_feats[..., 3] = d_cos
+                extra_channels.append(time_feats)
+
+            # S4: Static terrain channel: proxy ln(msl / sp)
+            if self.include_terrain:
+                # msl index = 2, sp index = 3
+                msl_val = np.maximum(x_raw[..., 2:3], 100.0)
+                sp_val = np.maximum(x_raw[..., 3:4], 100.0)
+                terrain = np.log(msl_val / sp_val)
+                # Normalize terrain proxy (~ mean 0.03, std 0.04)
+                terrain_norm = (terrain - 0.03) / 0.04
+                extra_channels.append(terrain_norm.astype(np.float32))
+
+            if len(extra_channels) > 0:
+                x_norm = np.concatenate([x_norm] + extra_channels, axis=-1)
                     
             # Normalize target (t2m)
             t_var = config.TARGET_VARIABLE
@@ -272,16 +309,16 @@ class ERA5Sequence(tf.keras.utils.Sequence):
                 y_norm = (y_raw - t_min) / t_range
                 
             # Pad spatial dimensions to (32, 48)
-            x_padded = self.dm.pad_spatial(x_norm)  # (6, 32, 48, 6)
+            x_padded = self.dm.pad_spatial(x_norm)  # (6, 32, 48, C_in)
             y_padded = self.dm.pad_spatial(y_norm)  # (1, 32, 48, num_horizons)
             
             if self.dim_model == "3d":
                 x_batch.append(x_padded)
                 y_batch.append(y_padded)
             elif self.dim_model == "2d":
-                # Flatten temporal lags into channels: (32, 48, lags * 6)
+                # Flatten temporal lags into channels
                 x_2d = np.transpose(x_padded, (1, 2, 0, 3)).reshape((config.PADDED_LAT, config.PADDED_LON, -1))
-                y_2d = y_padded[0]  # (32, 48, num_horizons)
+                y_2d = y_padded[0]
                 x_batch.append(x_2d)
                 y_batch.append(y_2d)
 
@@ -309,4 +346,3 @@ class ERA5Sequence(tf.keras.utils.Sequence):
             target_times_dict[h] = target_times[h_idx]
             
         return x_raw, y_raw_dict, last_observed_t2m, input_end_t, target_times_dict
-

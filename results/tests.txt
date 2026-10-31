@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.16, pytest-9.2.0, pluggy-1.7.0 -- /Users/agamghotra/Desktop/Final Datasets/Broad-UNet/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/agamghotra/Desktop/Final Datasets/Broad-UNet
+collecting ... collected 9 items
+
+tests/test_correctness.py::test_mlp_block_shape_and_identity PASSED      [ 11%]
+tests/test_correctness.py::test_kan_block_shape_and_identity PASSED      [ 22%]
+tests/test_correctness.py::test_sequential_mlp_kan_block PASSED          [ 33%]
+tests/test_correctness.py::test_parallel_mlp_kan_block PASSED            [ 44%]
+tests/test_correctness.py::test_conv3d_control_block PASSED              [ 55%]
+tests/test_correctness.py::test_gradient_flow_to_all_parameters PASSED   [ 66%]
+tests/test_correctness.py::test_broad_unet_v2_shape_and_residual PASSED  [ 77%]
+tests/test_correctness.py::test_single_batch_overfit PASSED              [ 88%]
+tests/test_correctness.py::test_determinism PASSED                       [100%]
+
+============================== 9 passed in 2.96s ===============================
