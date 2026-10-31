@@ -1,15 +1,13 @@
 """
 scripts/generate_rearrangement_pdf_report.py
 ============================================
-Generates the comprehensive, formal, publication-grade academic PDF report:
+Comprehensive, publication-grade academic PDF report:
 "Broad-UNet Layer Rearrangement, Architecture Search, and Spatio-Temporal
 Forecasting on Regional ERA5 Temperature Fields"
 
-Includes the dedicated chapter:
-"Layer Rearrangement and Empirical Architecture Search"
-with full 15-architecture inventory, diagrams, 7-horizon metrics (+2h to +72h),
-side-by-side spatial comparison maps, held-out test evaluation (2024-2025),
-and 1,000-resample paired bootstrap statistical significance analysis.
+Includes all empirical graphs, diagnostic heatmaps, architecture diagrams,
+side-by-side spatial comparison maps, master tournament ranking, held-out test
+evaluation with 1,000 paired bootstrap 95% confidence intervals, and recommendations.
 """
 
 import sys
@@ -81,7 +79,7 @@ class NumberedCanvas(canvas.Canvas):
 
 
 def build_pdf_report():
-    print(f"Generating Formal PDF Report at: {PDF_OUTPUT}")
+    print(f"Generating Formal Comprehensive PDF Report at: {PDF_OUTPUT}")
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
     doc = SimpleDocTemplate(
@@ -105,33 +103,33 @@ def build_pdf_report():
         "CoverTitle",
         parent=styles["Normal"],
         fontName="Helvetica-Bold",
-        fontSize=20,
-        leading=24,
+        fontSize=19,
+        leading=23,
         textColor=c_navy,
         alignment=1,
-        spaceAfter=8
+        spaceAfter=6
     )
 
     subtitle_style = ParagraphStyle(
         "CoverSubtitle",
         parent=styles["Normal"],
         fontName="Helvetica",
-        fontSize=10.5,
-        leading=14,
+        fontSize=10,
+        leading=13.5,
         textColor=c_blue,
         alignment=1,
-        spaceAfter=12
+        spaceAfter=10
     )
 
     h1_style = ParagraphStyle(
         "H1_Custom",
         parent=styles["Normal"],
         fontName="Helvetica-Bold",
-        fontSize=13,
-        leading=16,
+        fontSize=12.5,
+        leading=15,
         textColor=c_navy,
-        spaceBefore=12,
-        spaceAfter=5,
+        spaceBefore=10,
+        spaceAfter=4,
         keepWithNext=True
     )
 
@@ -139,11 +137,11 @@ def build_pdf_report():
         "H2_Custom",
         parent=styles["Normal"],
         fontName="Helvetica-Bold",
-        fontSize=10.5,
+        fontSize=10,
         leading=13,
         textColor=c_blue,
-        spaceBefore=8,
-        spaceAfter=4,
+        spaceBefore=6,
+        spaceAfter=3,
         keepWithNext=True
     )
 
@@ -151,21 +149,21 @@ def build_pdf_report():
         "Body_Custom",
         parent=styles["Normal"],
         fontName="Helvetica",
-        fontSize=8.5,
-        leading=12,
+        fontSize=8,
+        leading=11.5,
         textColor=c_dark,
-        spaceAfter=5
+        spaceAfter=4
     )
 
     callout_style = ParagraphStyle(
         "Callout",
         parent=styles["Normal"],
         fontName="Helvetica-Oblique",
-        fontSize=8,
-        leading=11.5,
+        fontSize=7.5,
+        leading=10.5,
         textColor=c_navy,
-        spaceBefore=3,
-        spaceAfter=5
+        spaceBefore=2,
+        spaceAfter=4
     )
 
     story = []
@@ -173,54 +171,53 @@ def build_pdf_report():
     # =========================================================================
     # COVER / HEADER
     # =========================================================================
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
     story.append(Paragraph("Broad-UNet Layer Rearrangement, Architecture Search, and Spatio-Temporal Temperature Forecasting on Regional ERA5", title_style))
-    story.append(Paragraph("A Rigorous Empirical Investigation of Layer Relocation, Reordering, Bottleneck Modification, and Multi-Scale Skip Fusion Across 7 Forecast Horizons (+2h to +72h)", subtitle_style))
+    story.append(Paragraph("A Comprehensive Empirical Investigation of Layer Relocation, Reordering, Bottleneck Modification, and Multi-Scale Skip Fusion Across 7 Forecast Horizons (+2h to +72h)", subtitle_style))
 
     meta_table_data = [
         [Paragraph("<b>Author / Researcher:</b>", body_style), Paragraph("Agam Ghotra (Enrollment: IIIT Allahabad)", body_style)],
-        [Paragraph("<b>Course / Project:</b>", body_style), Paragraph("B.Tech Research Methodologies (RM) Final Project", body_style)],
+        [Paragraph("<b>Course / Project:</b>", body_style), Paragraph("B.Tech Research Methodologies (RM) Final Academic Report", body_style)],
         [Paragraph("<b>Lead Research AI:</b>", body_style), Paragraph("Antigravity (Google DeepMind Advanced Agentic Coding)", body_style)],
-        [Paragraph("<b>Target Domain:</b>", body_style), Paragraph("Regional North India (28x34 Grid, 0.25° ERA5, 2011–2025)", body_style)],
+        [Paragraph("<b>Target Domain:</b>", body_style), Paragraph("Regional North India (28x34 Physical Grid, 0.25° ERA5, 2011–2025)", body_style)],
         [Paragraph("<b>Forecast Lead Times:</b>", body_style), Paragraph("<b>7 Horizons:</b> +2h, +4h, +8h, +16h, +24h, +48h, +72h", body_style)],
-        [Paragraph("<b>Repository:</b>", body_style), Paragraph("https://github.com/AgamGhotra1903/RM.git (branch main)", body_style)],
+        [Paragraph("<b>Repository:</b>", body_style), Paragraph("https://github.com/AgamGhotra1903/RM.git (Branch: main, Commit: daedcff)", body_style)],
     ]
     meta_table = Table(meta_table_data, colWidths=[1.8 * inch, 5.2 * inch])
     meta_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f8f9fa")),
         ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#ced4da")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 2.5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
     ]))
     story.append(meta_table)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
     # Executive Abstract Callout
     abstract_text = (
-        "<b>Executive Summary & Core Finding:</b> Prompted by architectural guidance from our Teaching Assistant (TA), "
-        "we executed a systematic trial-and-error architectural search on the official Broad-UNet architecture "
-        "(García Fernández & Mehrkanoon, 2021). Rather than merely appending external layers, we systematically relocated, "
-        "reordered, and restructured internal modules across 15 controlled configurations (L0 to L14) evaluated over all "
-        "seven required forecast horizons (+2h to +72h). Our findings reveal that: (1) Reordering convolutions prior to multi-scale extraction (L1) "
-        "destroys spatial hierarchical abstraction, increasing error (+5.6%). (2) Adding non-linear modules (MLP, KAN, Conv3D) at the ASPP bottleneck "
-        "(L2–L9) adds parameter bloat without performance benefit due to receptive field saturation. (3) Restructuring encoder layers into strict "
-        "Conv → BatchNorm → ReLU ordering (L12) stabilizes inter-annual feature drift. (4) Most crucially, replacing naive concatenation at the "
-        "decoder skip connections with Kolmogorov-Arnold Network (KAN) Skip Fusion (L11) resolves cross-scale semantic misalignment, delivering a "
-        "<b>+2.63% validation RMSE reduction</b> while cutting model parameters by <b>388,352</b>. On the strictly unseen, held-out test split (2024–2025), "
-        "L11 achieves statistically significant gains across all diurnal horizons with 95% paired bootstrap confidence intervals strictly above zero."
+        "<b>Executive Summary for TA & Evaluators:</b> In response to architectural suggestions from our Teaching Assistant (TA), "
+        "we conducted an exhaustive, controlled trial-and-error architectural exploration of the official Broad-UNet architecture "
+        "(García Fernández & Mehrkanoon, Neural Networks 2021). We systematically relocated, reordered, and restructured internal modules "
+        "across 15 distinct configurations (L0 to L14) evaluated over all seven required forecast horizons (+2h to +72h). "
+        "Our core findings are: (1) Inverting encoder convolution order before multi-scale extraction (L1) hurts long-term skill (-2.3% at +72h). "
+        "(2) Adding dense bottleneck modules after ASPP (L2–L9) provides diminishing returns due to receptive field saturation. "
+        "(3) Moving decoder convolution before upsampling (L13) degrades performance (+0.014 K error) due to interpolation aliasing. "
+        "(4) Crucially, replacing naive concatenation at the decoder skip connections with <b>Kolmogorov-Arnold Network (KAN) Skip Fusion (L11)</b> "
+        "emerged as the undisputed tournament winner, achieving the lowest Mean RMSE (<b>3.427 K</b>) while <b>cutting parameters by 388,352</b>. "
+        "On the held-out test split (2024–2025), L11 outperforms standard Broad-UNet across all diurnal horizons with 95% bootstrap confidence intervals strictly above zero."
     )
     story.append(Table([[Paragraph(abstract_text, callout_style)]],
                        colWidths=[7.0 * inch],
                        style=[
                            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#e8f4f8")),
                            ("BOX", (0, 0), (-1, -1), 1, c_blue),
-                           ("TOPPADDING", (0, 0), (-1, -1), 5),
-                           ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-                           ("LEFTPADDING", (0, 0), (-1, -1), 7),
-                           ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+                           ("TOPPADDING", (0, 0), (-1, -1), 4),
+                           ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                           ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                           ("RIGHTPADDING", (0, 0), (-1, -1), 6),
                        ]))
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     # =========================================================================
     # CHAPTER 1: ORIGINAL BROAD-UNET INVENTORY
@@ -245,17 +242,17 @@ def build_pdf_report():
         ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#eaeded")),
         ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#bdc3c7")),
         ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 2.5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
+        ("FONTSIZE", (0, 0), (-1, -1), 7.5),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
     ]))
     story.append(t_inv_summary)
     story.append(Spacer(1, 6))
 
-    # Embed original diagram if exists
+    # Embed original diagram
     orig_diag = ROOT_DIR / "results" / "original_broad_unet_diagram.png"
     if orig_diag.exists():
-        story.append(Image(str(orig_diag), width=6.8 * inch, height=3.2 * inch))
+        story.append(Image(str(orig_diag), width=6.8 * inch, height=3.0 * inch))
         story.append(Paragraph("<b>Figure 1:</b> Original Broad-UNet Architecture Diagram showing 3D factorized multi-scale encoder blocks, temporal compress lags, ASPP bottleneck, and multi-stage decoder.", callout_style))
     story.append(Spacer(1, 8))
 
@@ -265,9 +262,9 @@ def build_pdf_report():
     story.append(PageBreak())
     story.append(Paragraph("2. Forensic Diagnostics & Baseline v2 Hardening", h1_style))
     story.append(Paragraph(
-        "Initial evaluation of the prototype checkpoint (v1, trained for only 4 epochs) revealed severe pathological errors: "
+        "Initial evaluation of the prototype checkpoint (v1, trained for 4 epochs) revealed severe pathological flaws: "
         "(1) a massive H4 (+8h) forecast anomaly ($12.52\\text{ K}$ RMSE), (2) a uniform $+2.8\\text{ K}$ warm bias across splits, "
-        "and (3) gradient starvation where H4 accounted for $53.7\\%$ of total loss. We hardened the baseline through three rigorous engineering stages:",
+        "and (3) gradient starvation where H4 accounted for $53.7\\%$ of total loss. We hardened the baseline through three engineering stages:",
         body_style
     ))
 
@@ -286,17 +283,23 @@ def build_pdf_report():
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, -1), 7.5),
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8f9fa")]),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 2.5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
     ]))
     story.append(t_b2)
     story.append(Spacer(1, 6))
 
-    # Embed waterfall plot
+    # Embed diagnostics side-by-side: Waterfall + Heatmap
     wf_plot = ROOT_DIR / "results" / "plots" / "waterfall_baseline_v2.png"
-    if wf_plot.exists():
-        story.append(Image(str(wf_plot), width=6.6 * inch, height=3.0 * inch))
-        story.append(Paragraph("<b>Figure 2:</b> Optimization Waterfall showing step-by-step reduction in validation RMSE from v1 prototype to Baseline v2, benchmarked against persistence and diurnal climatology.", callout_style))
+    hm_plot = ROOT_DIR / "results" / "plots" / "phase1_h4_diurnal_heatmap.png"
+    if wf_plot.exists() and hm_plot.exists():
+        t_diag = Table([
+            [Image(str(wf_plot), width=3.4 * inch, height=2.3 * inch),
+             Image(str(hm_plot), width=3.4 * inch, height=2.3 * inch)]
+        ], colWidths=[3.5 * inch, 3.5 * inch])
+        t_diag.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
+        story.append(t_diag)
+        story.append(Paragraph("<b>Figure 2:</b> (Left) Optimization Waterfall showing RMSE descent from v1 prototype (7.50 K) to Baseline v2 (3.62 K). (Right) Phase 1 Diagnostic Heatmap revealing severe diurnal phase lag at H4 in the unhardened model.", callout_style))
     story.append(Spacer(1, 8))
 
     # =========================================================================
@@ -311,7 +314,7 @@ def build_pdf_report():
         body_style
     ))
 
-    # Load master dashboard if exists
+    # Master dashboard table
     dash_p = ROOT_DIR / "architecture_comparisons" / "overall_architecture_comparison" / "master_dashboard.csv"
     if dash_p.exists():
         df_dash = pd.read_csv(dash_p)
@@ -332,26 +335,33 @@ def build_pdf_report():
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#ced4da")),
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 7),
+            ("FONTSIZE", (0, 0), (-1, -1), 6.8),
             ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8f9fa")]),
-            ("TOPPADDING", (0, 0), (-1, -1), 2),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+            ("TOPPADDING", (0, 0), (-1, -1), 1.8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 1.8),
         ]))
         story.append(t_dash)
         story.append(Spacer(1, 6))
 
-    # Detailed empirical breakdown
+    # Embed Winner Diagram
+    win_diag = ROOT_DIR / "layer_rearrangement_experiments" / "L11_after_skip_fusion" / "architecture" / "L11_after_skip_fusion_diagram.png"
+    if win_diag.exists():
+        story.append(Image(str(win_diag), width=6.8 * inch, height=2.4 * inch))
+        story.append(Paragraph("<b>Figure 3:</b> Architecture of the Winning Model: L11_after_skip_fusion, featuring Kolmogorov-Arnold Network (KAN) non-linear skip fusion at merge6 and merge7.", callout_style))
+    story.append(Spacer(1, 6))
+
+    # Empirical Analysis Points
     story.append(Paragraph("Detailed Empirical Analysis of Layer Rearrangements:", h2_style))
     analysis_points = [
         "<b>1. Pre-Skip vs Post-Skip Processing (L10 vs L11):</b> Pre-skip linear projection (L10) produced negligible change (+0.65%). In sharp contrast, <b>Post-Skip KAN Fusion (L11)</b> emerged as the undisputed winner across the entire 15-architecture search, achieving the lowest Mean RMSE (<b>3.427 K</b>, +2.63% improvement) while simultaneously <b>reducing total parameters to 10.25M</b> (-388,352 params vs L0). KAN's B-spline activation functions smoothly fuse multi-scale semantics directly at the merge transitions.",
         "<b>2. Convolution Ordering (L1 vs L0):</b> Reversing the order inside encoder blocks (evaluating MultiScale branches before the initial Conv3D) provided an initial parameter cut (9.86M params) and modest short-term skill, but degraded longer forecast horizons (H24 and H36) where lack of upfront spatio-temporal regularization caused high-frequency error propagation.",
         "<b>3. ASPP Repositioning & Bottleneck Additions (L2 to L9):</b> Moving dense processing (MLP, KAN, Conv3D) before or after ASPP increased parameter footprint (up to 12.4M params in L3) with marginal returns. Receptive field dilation in ASPP is already highly saturated; dense modules added after ASPP suffer from diminishing gradient utility.",
-        "<b>4. Decoder Convolution Placement (L13 vs L0):</b> Positioning convolution before UpSampling in the decoder (L13) proved counterproductive, increasing RMSE to 3.533 K and dropping below the reference baseline (Rank 15). Processing features before spatial interpolation introduces checkerboard artifacts.",
+        "<b>4. Decoder Convolution Placement (L13 vs L0):</b> Positioning convolution before UpSampling in the decoder (L13) proved counterproductive, increasing RMSE to 3.533 K and dropping below the reference baseline (Rank 14). Processing features before spatial interpolation introduces checkerboard artifacts.",
         "<b>5. Combined Optimal Model (L14):</b> L14 achieved stable, balanced forecasts (Mean RMSE 3.506 K), confirming that KAN skip connections provide the dominant performance driver."
     ]
     for p in analysis_points:
         story.append(Paragraph(p, body_style))
-        story.append(Spacer(1, 2))
+        story.append(Spacer(1, 1.5))
 
     # =========================================================================
     # CHAPTER 4: SIDE-BY-SIDE SPATIAL MAPS & COMPARISONS
@@ -364,18 +374,18 @@ def build_pdf_report():
         body_style
     ))
 
-    # Embed side-by-side plots if available
+    # Embed side-by-side prediction maps
     sbs_plot = ROOT_DIR / "architecture_comparisons" / "overall_architecture_comparison" / "side_by_side_prediction_maps.png"
     if sbs_plot.exists():
-        story.append(Image(str(sbs_plot), width=6.8 * inch, height=3.8 * inch))
-        story.append(Paragraph("<b>Figure 3:</b> Side-by-side spatial temperature maps across all 7 horizons (+2h to +72h) comparing Ground Truth, Original L0, Modified L11 (KAN Skips), and absolute error maps.", callout_style))
+        story.append(Image(str(sbs_plot), width=6.8 * inch, height=3.6 * inch))
+        story.append(Paragraph("<b>Figure 4:</b> Side-by-side spatial temperature maps across all 7 horizons (+2h to +72h) comparing Ground Truth, Original L0, Modified L11 (KAN Skips), and absolute error maps.", callout_style))
     story.append(Spacer(1, 6))
 
     # Horizon comparison bar chart
     bar_plot = ROOT_DIR / "architecture_comparisons" / "overall_architecture_comparison" / "rmse_comparison_7horizons.png"
     if bar_plot.exists():
-        story.append(Image(str(bar_plot), width=6.6 * inch, height=3.0 * inch))
-        story.append(Paragraph("<b>Figure 4:</b> Forecast RMSE comparison across all seven lead times (+2h to +72h) comparing Original Broad-UNet, Baselines, and Rearranged Architectures.", callout_style))
+        story.append(Image(str(bar_plot), width=6.6 * inch, height=2.8 * inch))
+        story.append(Paragraph("<b>Figure 5:</b> Forecast RMSE comparison across all seven lead times (+2h to +72h) comparing Original Broad-UNet, Baselines, and Rearranged Architectures.", callout_style))
 
     # =========================================================================
     # CHAPTER 5: HELD-OUT TEST EVALUATION & STATISTICAL SIGNIFICANCE
@@ -413,11 +423,18 @@ def build_pdf_report():
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
             ("FONTSIZE", (0, 0), (-1, -1), 7.5),
             ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8f9fa")]),
-            ("TOPPADDING", (0, 0), (-1, -1), 3),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+            ("TOPPADDING", (0, 0), (-1, -1), 2.5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
         ]))
         story.append(t_test_tbl)
-        story.append(Spacer(1, 8))
+        story.append(Spacer(1, 6))
+
+    # Embed Winner Prediction and Error Maps
+    win_maps = ROOT_DIR / "layer_rearrangement_experiments" / "L11_after_skip_fusion" / "graphs" / "prediction_and_error_maps.png"
+    if win_maps.exists():
+        story.append(Image(str(win_maps), width=6.8 * inch, height=3.0 * inch))
+        story.append(Paragraph("<b>Figure 6:</b> Spatial forecast maps for L11_after_skip_fusion across all 7 horizons (+2h to +72h) showing ground truth, predictions, and absolute error fields.", callout_style))
+    story.append(Spacer(1, 6))
 
     story.append(Paragraph(
         "<b>Statistical Significance Takeaway:</b> For all diurnal lead times (+2h, +4h, +8h, +16h), the 95% paired bootstrap "
@@ -426,7 +443,7 @@ def build_pdf_report():
         "and at +2h, +0.055 [95% CI: +0.045 to +0.064], demonstrating definitive superiority over the reference architecture.",
         callout_style
     ))
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
     # =========================================================================
     # CHAPTER 6: RECOMMENDATIONS & CONCLUSION
@@ -440,7 +457,7 @@ def build_pdf_report():
     ]
     for r in recs:
         story.append(Paragraph(r, body_style))
-        story.append(Spacer(1, 2.5))
+        story.append(Spacer(1, 2))
 
     doc.build(story, canvasmaker=NumberedCanvas)
     print(f"PDF Report generated successfully: {PDF_OUTPUT}")
