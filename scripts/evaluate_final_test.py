@@ -34,16 +34,39 @@ HORIZONS = [1, 2, 4, 8, 12, 24, 36]
 LEAD_HOURS = [2, 4, 8, 16, 24, 48, 72]
 HORIZON_MAP = dict(zip(HORIZONS, LEAD_HOURS))
 
+ALL_EXP_NAMES = dict(EXPERIMENT_NAMES)
+ALL_EXP_NAMES["L15_hybrid_kan_leaky_relu"] = "Hybrid KAN Skip Fusion + LeakyReLU Backbone"
+
+def get_model(exp_id: str):
+    if exp_id == "L15_hybrid_kan_leaky_relu":
+        from models.hybrid_model import build_hybrid_kan_leaky_relu
+        return build_hybrid_kan_leaky_relu(
+            lags=6, latitude=32, longitude=48, features=10, features_output=7,
+            filters=16, dropout=0.2, residual_head=True
+        )
+    elif exp_id.startswith("act_"):
+        from models.activation_models import build_broad_unet_with_activation
+        act = exp_id.replace("act_", "")
+        return build_broad_unet_with_activation(
+            activation=act, lags=6, latitude=32, longitude=48, features=10, features_output=7,
+            filters=16, dropout=0.2, residual_head=True
+        )
+    else:
+        return build_rearranged_model(
+            exp_id=exp_id, lags=6, latitude=32, longitude=48, features=10, features_output=7,
+            filters=16, dropout=0.2, residual_head=True
+        )
+
 def run_test_evaluation(
-    winner_exp: str = "L11_after_skip_fusion",
+    winner_exp: str = "L15_hybrid_kan_leaky_relu",
     baseline_exp: str = "L0_original",
     max_test_samples: int = 400,
     n_bootstraps: int = 1000
 ):
     print("=" * 80)
     print("FINAL HELD-OUT TEST EVALUATION (2024-2025) ACROSS 7 FORECAST HORIZONS")
-    print(f"Target Winner Architecture: {winner_exp} ({EXPERIMENT_NAMES.get(winner_exp, '')})")
-    print(f"Reference Architecture    : {baseline_exp} ({EXPERIMENT_NAMES.get(baseline_exp, '')})")
+    print(f"Target Winner Architecture: {winner_exp} ({ALL_EXP_NAMES.get(winner_exp, '')})")
+    print(f"Reference Architecture    : {baseline_exp} ({ALL_EXP_NAMES.get(baseline_exp, '')})")
     print(f"Lead Times Evaluated      : {LEAD_HOURS} hours")
     print("=" * 80)
 
@@ -74,23 +97,25 @@ def run_test_evaluation(
 
     # 1. Load Winner Model
     print(f"\nLoading Winner Model Checkpoint: {winner_exp}...")
-    winner_ckpt = Path(f"layer_rearrangement_experiments/{winner_exp}/checkpoint/best_model.keras")
+    if winner_exp.startswith("act_"):
+        winner_ckpt = Path(f"activation_experiments/{winner_exp}/checkpoint/best_model.keras")
+    else:
+        winner_ckpt = Path(f"layer_rearrangement_experiments/{winner_exp}/checkpoint/best_model.keras")
+    
     if not winner_ckpt.exists():
         raise FileNotFoundError(f"Winner checkpoint not found: {winner_ckpt}")
 
-    winner_model = build_rearranged_model(
-        exp_id=winner_exp, lags=6, latitude=32, longitude=48, features=10, features_output=7,
-        filters=16, dropout=0.2, residual_head=True
-    )
+    winner_model = get_model(winner_exp)
     winner_model.load_weights(str(winner_ckpt))
 
     # 2. Load Reference Model (L0_original)
     print(f"Loading Reference Model Checkpoint: {baseline_exp}...")
-    ref_ckpt = Path(f"layer_rearrangement_experiments/{baseline_exp}/checkpoint/best_model.keras")
-    ref_model = build_rearranged_model(
-        exp_id=baseline_exp, lags=6, latitude=32, longitude=48, features=10, features_output=7,
-        filters=16, dropout=0.2, residual_head=True
-    )
+    if baseline_exp.startswith("act_"):
+        ref_ckpt = Path(f"activation_experiments/{baseline_exp}/checkpoint/best_model.keras")
+    else:
+        ref_ckpt = Path(f"layer_rearrangement_experiments/{baseline_exp}/checkpoint/best_model.keras")
+
+    ref_model = get_model(baseline_exp)
     ref_model.load_weights(str(ref_ckpt))
 
     # Run inference across held-out test split
@@ -251,12 +276,18 @@ def run_test_evaluation(
         })
 
     # Save test metrics JSON and CSV
-    json_out = Path("results/test_metrics_7horizons_comparison.json")
+    json_out = Path(f"results/test_metrics_7horizons_{winner_exp}_vs_{baseline_exp}.json")
     with open(json_out, "w") as f:
         json.dump(comparison_metrics, f, indent=2)
 
-    csv_out = Path("results/test_metrics_7horizons_comparison.csv")
+    csv_out = Path(f"results/test_metrics_7horizons_{winner_exp}_vs_{baseline_exp}.csv")
     pd.DataFrame(csv_rows).to_csv(csv_out, index=False)
+
+    # Also update master comparison files
+    with open(Path("results/test_metrics_7horizons_comparison.json"), "w") as f:
+        json.dump(comparison_metrics, f, indent=2)
+    pd.DataFrame(csv_rows).to_csv(Path("results/test_metrics_7horizons_comparison.csv"), index=False)
+
     print(f"\nSaved test comparison JSON to {json_out} and CSV to {csv_out}")
 
     return comparison_metrics
@@ -264,7 +295,7 @@ def run_test_evaluation(
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--winner", type=str, default="L11_after_skip_fusion")
+    parser.add_argument("--winner", type=str, default="L15_hybrid_kan_leaky_relu")
     parser.add_argument("--ref", type=str, default="L0_original")
     parser.add_argument("--max_samples", type=int, default=400)
     parser.add_argument("--bootstraps", type=int, default=1000)

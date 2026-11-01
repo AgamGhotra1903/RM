@@ -1,0 +1,6 @@
+Activation,Description,Parameters,Mean_Val_RMSE_K,Mean_Skill_vs_Pers,Diff_vs_ReLU_K,Pct_Gain,Outcome,H1_RMSE,H2_RMSE,H4_RMSE,H8_RMSE,H12_RMSE,H24_RMSE,H36_RMSE
+TANH,Hyperbolic Tangent (Symmetric bounded ,10642935,3.254,0.055,-0.266,7.56,Improved Performance (★ Significant),1.877,3.198,4.716,4.398,2.208,2.936,3.443
+LEAKY_RELU,Leaky ReLU (Non-zero slope 0.2 for x <,10642935,3.373,0.037,-0.147,4.17,Improved Performance (★ Significant),1.9,3.354,4.984,5.132,2.191,2.815,3.236
+GELU,Gaussian Error Linear Unit (Smooth pro,10642935,3.482,0.009,-0.037,1.06,Slight Improvement,2.073,3.488,5.341,5.235,2.138,2.822,3.279
+SILU,Sigmoid Linear Unit / Swish (Smooth se,10642935,3.502,0.008,-0.018,0.51,Slight Improvement,2.042,3.483,5.366,5.436,2.131,2.807,3.247
+RELU,Standard Rectified Linear Unit (Baseli,10642935,3.52,0.001,0.0,-0.0,No Meaningful Difference (Equivalent),2.131,3.55,5.381,5.411,2.124,2.795,3.245

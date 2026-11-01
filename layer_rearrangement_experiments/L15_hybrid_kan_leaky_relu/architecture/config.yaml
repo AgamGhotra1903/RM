@@ -1,0 +1,26 @@
+activation: leaky_relu
+batch_size: 4
+epochs: 2
+eval_samples: 160
+exp_id: L15_hybrid_kan_leaky_relu
+horizons:
+- 1
+- 2
+- 4
+- 8
+- 12
+- 24
+- 36
+lead_hours:
+- 2
+- 4
+- 8
+- 16
+- 24
+- 48
+- 72
+learning_rate: 0.0003
+name: Hybrid KAN Skip Fusion + LeakyReLU Backbone
+skip_fusion: kan_merge6_merge7
+steps_per_epoch: 10
+val_steps: 3
