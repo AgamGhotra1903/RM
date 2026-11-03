@@ -570,6 +570,51 @@ def build_pdf_report():
         story.append(Paragraph(r, body_style))
         story.append(Spacer(1, 2))
 
+    # =========================================================================
+    # CHAPTER 8: PRESENTATION-READY COMPUTATIONAL GRAPH GALLERY
+    # =========================================================================
+    story.append(PageBreak())
+    story.append(Paragraph("8. Presentation-Ready Computational Graph Gallery", h1_style))
+    story.append(Paragraph(
+        "For academic defense, seminars, and slide-deck presentations, four high-resolution (16:9 widescreen, 300 DPI) "
+        "computational graph diagrams were generated using pure Python code. These vector-style diagrams detail the macro-DAG "
+        "topology, micro-block operations (factorized 3D convolutions, ASPP pyramid, KAN B-splines), and model evolution:",
+        body_style
+    ))
+    story.append(Spacer(1, 4))
+
+    pres_dir = ROOT_DIR / "results" / "presentation_graphs"
+    slide1 = pres_dir / "1_broad_unet_macro_architecture_16x9.png"
+    slide2 = pres_dir / "2_internal_block_mechanisms_deepdive.png"
+    slide3 = pres_dir / "3_architectural_evolution_comparison.png"
+    slide4 = pres_dir / "4_layer_rearrangement_search_taxonomy.png"
+
+    if slide1.exists():
+        story.append(Image(str(slide1), width=6.8 * inch, height=3.8 * inch))
+        story.append(Paragraph("<b>Figure 8:</b> Master Macro-Architecture Graph of Champion Model L15 (Hybrid KAN + LeakyReLU Broad-UNet). Shows end-to-end tensor dimensions, 4 downsampling stages, temporal lag compression, 4 skip highways, and the Anchor Residual bypass highway.", callout_style))
+        story.append(Spacer(1, 6))
+
+    if slide2.exists():
+        story.append(PageBreak())
+        story.append(Paragraph("8.1 Micro-Architectural Internal Mechanics Deep-Dive", h2_style))
+        story.append(Image(str(slide2), width=6.8 * inch, height=3.8 * inch))
+        story.append(Paragraph("<b>Figure 9:</b> Micro-Architectural Deep Dive into the 4 Core Engines: (A) Factorized MultiScale 3D Convolutions (-66.7% parameters), (B) ASPP Multi-Rate Receptive Field Pyramid, (C) Skip Connection Fusion: Naive Concatenation vs Learnable KAN B-Splines, and (D) Mathematical Formulation of the Anchor Residual Head.", callout_style))
+        story.append(Spacer(1, 6))
+
+    if slide3.exists():
+        story.append(PageBreak())
+        story.append(Paragraph("8.2 Architectural Evolution & Comparative Matrix", h2_style))
+        story.append(Image(str(slide3), width=6.8 * inch, height=3.8 * inch))
+        story.append(Paragraph("<b>Figure 10:</b> Side-by-side comparative evolution across the four pivotal architectures: Upstream Broad-UNet (unmodified baseline), L0 Baseline (+ Anchor Residual Head), L11 Top Rearrangement (+ KAN Skip Fusion), and L15 Champion Hybrid (+ KAN + LeakyReLU).", callout_style))
+        story.append(Spacer(1, 6))
+
+    if slide4.exists():
+        story.append(PageBreak())
+        story.append(Paragraph("8.3 Architectural Search Taxonomy & Activation Landscape", h2_style))
+        story.append(Image(str(slide4), width=6.8 * inch, height=3.8 * inch))
+        story.append(Paragraph("<b>Figure 11:</b> Comprehensive landscape map of all 15 layer rearrangements categorized into Bottleneck Modifications (L2-L9), Skip Modifications (L10-L11), and Order/Compound Rearrangements (L1, L12-L15), paired with the Global Activation Benchmark.", callout_style))
+        story.append(Spacer(1, 6))
+
     doc.build(story, canvasmaker=NumberedCanvas)
     print(f"PDF Report generated successfully: {PDF_OUTPUT}")
 
