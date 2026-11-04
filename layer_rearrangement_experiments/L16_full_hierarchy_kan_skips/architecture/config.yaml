@@ -1,0 +1,10 @@
+batch_size: 4
+category: Skip Connection Mastery
+epochs: 2
+eval_samples: 160
+exp_id: L16_full_hierarchy_kan_skips
+learning_rate: 0.0003
+name: Full-Hierarchy 4-Stage KAN Skip Fusion
+params: 10230455
+steps_per_epoch: 10
+val_steps: 3

@@ -518,10 +518,12 @@
 
     // Horizon Plot
     const horizons = ['+2h', '+4h', '+8h', '+16h', '+24h', '+48h', '+72h'];
+    const l17_rmse = [2.067, 3.322, 4.856, 5.401, 1.887, 2.265, 2.446];
     const l15_rmse = [1.978, 3.368, 5.776, 5.743, 1.904, 2.288, 2.510];
     const l0_rmse  = [2.263, 3.902, 6.028, 6.011, 1.854, 2.245, 2.458];
     const pers_rmse= [2.265, 3.895, 6.035, 6.071, 1.853, 2.240, 2.450];
 
+    const l17_skill = [0.088, 0.147, 0.195, 0.110, -0.018, -0.011, 0.002];
     const l15_skill = [0.126, 0.137, 0.043, 0.054, -0.028, -0.021, -0.024];
     const l0_skill  = [0.001, -0.002, 0.001, 0.010, -0.001, -0.002, -0.003];
 
@@ -537,7 +539,8 @@
         title = 'Held-Out Test RMSE Across 7 Lead Times (Kelvin) - Lower is Better';
         ytitle = 'Test RMSE (K)';
         data = [
-          { x: horizons, y: l15_rmse, name: 'L15 Champion (KAN + LeakyReLU)', type: 'bar', marker: { color: '#e53e3e' } },
+          { x: horizons, y: l17_rmse, name: 'L17 Apex Champion (Decoupled Heads)', type: 'bar', marker: { color: '#e53e3e' } },
+          { x: horizons, y: l15_rmse, name: 'L15 Tournament Hybrid', type: 'bar', marker: { color: '#805ad5' } },
           { x: horizons, y: l0_rmse,  name: 'L0 Baseline Broad-UNet', type: 'bar', marker: { color: '#3182ce' } },
           { x: horizons, y: pers_rmse,name: 'Persistence Baseline', type: 'scatter', mode: 'lines+markers', line: { dash: 'dash', color: '#718096', width: 2 } }
         ];
@@ -545,7 +548,8 @@
         title = 'Held-Out Test Skill vs Persistence - Higher is Better';
         ytitle = 'Skill Score (1 - RMSE_model / RMSE_persistence)';
         data = [
-          { x: horizons, y: l15_skill, name: 'L15 Champion Skill', type: 'bar', marker: { color: '#e53e3e' } },
+          { x: horizons, y: l17_skill, name: 'L17 Apex Skill', type: 'bar', marker: { color: '#e53e3e' } },
+          { x: horizons, y: l15_skill, name: 'L15 Hybrid Skill', type: 'bar', marker: { color: '#805ad5' } },
           { x: horizons, y: l0_skill,  name: 'L0 Baseline Skill', type: 'bar', marker: { color: '#3182ce' } }
         ];
       }
@@ -562,24 +566,28 @@
       Plotly.newPlot('horizon-plot', data, layout, { responsive: true });
     }
 
-    // Tournament Data
+    // Tournament Data (All 20 Models)
     const tournament = [
-      { rank: 1, id: 'L15_hybrid_kan_leaky_relu', desc: 'KAN Skip Fusion + LeakyReLU (alpha=0.2)', params: '10,254,583', rmse: '3.369 K', gain: '+4.29%', cat: 'CHAMPION ⭐' },
-      { rank: 2, id: 'L11_after_skip_fusion', desc: 'Post-Skip KAN Fusion at Merge6/7', params: '10,254,583', rmse: '3.427 K', gain: '+2.63%', cat: 'Skip Rearrangement' },
-      { rank: 3, id: 'L9_kan_then_mlp', desc: 'Sequential KAN -> MLP After ASPP', params: '11,300,599', rmse: '3.448 K', gain: '+2.05%', cat: 'Bottleneck Compound' },
-      { rank: 4, id: 'L5_mlp_after_aspp', desc: 'MLP Channel Mixing After ASPP', params: '10,906,615', rmse: '3.470 K', gain: '+1.40%', cat: 'Bottleneck Rearrangement' },
-      { rank: 5, id: 'L4_mlp_before_aspp', desc: 'MLP Channel Mixing Before ASPP', params: '10,906,615', rmse: '3.476 K', gain: '+1.23%', cat: 'Bottleneck Rearrangement' },
-      { rank: 6, id: 'L2_conv_before_aspp', desc: 'Additional Conv3D Before ASPP', params: '11,233,015', rmse: '3.481 K', gain: '+1.10%', cat: 'Bottleneck Rearrangement' },
-      { rank: 7, id: 'L8_mlp_then_kan', desc: 'Sequential MLP -> KAN After ASPP', params: '11,300,599', rmse: '3.483 K', gain: '+1.04%', cat: 'Bottleneck Compound' },
-      { rank: 8, id: 'L6_kan_before_aspp', desc: 'KAN Block Before ASPP', params: '11,036,919', rmse: '3.487 K', gain: '+0.92%', cat: 'Bottleneck Rearrangement' },
-      { rank: 9, id: 'L1_conv_rearrangement', desc: 'MultiScale Before Conv3D in Encoder', params: '9,859,651', rmse: '3.497 K', gain: '+0.65%', cat: 'Encoder Rearrangement' },
-      { rank: 10, id: 'L10_before_skip_fusion', desc: 'Pre-Skip Linear Conv3D Projection', params: '10,663,607', rmse: '3.497 K', gain: '+0.65%', cat: 'Skip Rearrangement' },
-      { rank: 11, id: 'L3_conv_after_aspp', desc: 'Additional Conv3D After ASPP', params: '12,412,663', rmse: '3.503 K', gain: '+0.47%', cat: 'Bottleneck Rearrangement' },
-      { rank: 12, id: 'L12_encoder_rearrangement', desc: 'Conv -> BatchNorm -> ReLU Ordering', params: '10,649,655', rmse: '3.503 K', gain: '+0.48%', cat: 'Norm/Act Rearrangement' },
-      { rank: 13, id: 'L14_best_combined', desc: 'Best Combined Arrangement', params: '10,851,383', rmse: '3.506 K', gain: '+0.40%', cat: 'Compound Architecture' },
-      { rank: 14, id: 'L0_original (Baseline)', desc: 'Standard Broad-UNet + Anchor Head', params: '10,642,935', rmse: '3.520 K', gain: '0.00%', cat: 'Reference Baseline' },
-      { rank: 15, id: 'L13_decoder_rearrangement', desc: 'Conv3D Before UpSampling (Aliased)', params: '11,585,207', rmse: '3.533 K', gain: '-0.39%', cat: 'Decoder Rearrangement' },
-      { rank: 16, id: 'L7_kan_after_aspp', desc: 'KAN Block After ASPP', params: '11,036,919', rmse: '3.535 K', gain: '-0.44%', cat: 'Bottleneck Rearrangement' }
+      { rank: 1, id: 'L17_decoupled_diurnal_synoptic_heads', desc: 'Decoupled Diurnal (Tanh) + Synoptic (Linear) Heads', params: '10,254,583', rmse: '3.211 K', gain: '+8.77%', cat: 'APEX CHAMPION ⭐' },
+      { rank: 2, id: 'L19_apex_hybrid_kan_se_decoupled', desc: 'APEX HYBRID: KAN Skips + ST-SE + Decoupled Heads', params: '10,285,903', rmse: '3.241 K', gain: '+7.94%', cat: 'Apex Synthesis' },
+      { rank: 3, id: 'L18_spatiotemporal_se_multiscale', desc: 'Spatio-Temporal SE Channel-Lag Attention', params: '10,310,031', rmse: '3.318 K', gain: '+5.73%', cat: 'Channel Attention' },
+      { rank: 4, id: 'L15_hybrid_kan_leaky_relu', desc: 'KAN Skip Fusion + LeakyReLU (alpha=0.2)', params: '10,254,583', rmse: '3.369 K', gain: '+4.29%', cat: 'Hybrid Skip/Act' },
+      { rank: 5, id: 'L11_after_skip_fusion', desc: 'Post-Skip KAN Fusion at Merge6/7', params: '10,254,583', rmse: '3.427 K', gain: '+2.63%', cat: 'Skip Rearrangement' },
+      { rank: 6, id: 'L9_kan_then_mlp', desc: 'Sequential KAN -> MLP After ASPP', params: '11,300,599', rmse: '3.448 K', gain: '+2.05%', cat: 'Bottleneck Compound' },
+      { rank: 7, id: 'L5_mlp_after_aspp', desc: 'MLP Channel Mixing After ASPP', params: '10,906,615', rmse: '3.470 K', gain: '+1.40%', cat: 'Bottleneck Rearrangement' },
+      { rank: 8, id: 'L4_mlp_before_aspp', desc: 'MLP Channel Mixing Before ASPP', params: '10,906,615', rmse: '3.476 K', gain: '+1.23%', cat: 'Bottleneck Rearrangement' },
+      { rank: 9, id: 'L2_conv_before_aspp', desc: 'Additional Conv3D Before ASPP', params: '11,233,015', rmse: '3.481 K', gain: '+1.10%', cat: 'Bottleneck Rearrangement' },
+      { rank: 10, id: 'L8_mlp_then_kan', desc: 'Sequential MLP -> KAN After ASPP', params: '11,300,599', rmse: '3.483 K', gain: '+1.04%', cat: 'Bottleneck Compound' },
+      { rank: 11, id: 'L6_kan_before_aspp', desc: 'KAN Block Before ASPP', params: '11,036,919', rmse: '3.487 K', gain: '+0.92%', cat: 'Bottleneck Rearrangement' },
+      { rank: 12, id: 'L1_conv_rearrangement', desc: 'MultiScale Before Conv3D in Encoder', params: '9,859,651', rmse: '3.497 K', gain: '+0.65%', cat: 'Encoder Rearrangement' },
+      { rank: 13, id: 'L10_before_skip_fusion', desc: 'Pre-Skip Linear Conv3D Projection', params: '10,663,607', rmse: '3.497 K', gain: '+0.65%', cat: 'Skip Rearrangement' },
+      { rank: 14, id: 'L3_conv_after_aspp', desc: 'Additional Conv3D After ASPP', params: '12,412,663', rmse: '3.503 K', gain: '+0.47%', cat: 'Bottleneck Rearrangement' },
+      { rank: 15, id: 'L12_encoder_rearrangement', desc: 'Conv -> BatchNorm -> ReLU Ordering', params: '10,649,655', rmse: '3.503 K', gain: '+0.48%', cat: 'Norm/Act Rearrangement' },
+      { rank: 16, id: 'L14_best_combined', desc: 'Best Combined Arrangement', params: '10,851,383', rmse: '3.506 K', gain: '+0.40%', cat: 'Compound Architecture' },
+      { rank: 17, id: 'L16_full_hierarchy_kan_skips', desc: 'Full 4-Stage KAN Skips (Merge6-9)', params: '10,230,455', rmse: '3.507 K', gain: '+0.38%', cat: 'Skip Hierarchy' },
+      { rank: 18, id: 'L0_original (Baseline)', desc: 'Standard Broad-UNet + Anchor Head', params: '10,642,935', rmse: '3.520 K', gain: '0.00%', cat: 'Reference Baseline' },
+      { rank: 19, id: 'L13_decoder_rearrangement', desc: 'Conv3D Before UpSampling (Aliased)', params: '11,585,207', rmse: '3.533 K', gain: '-0.39%', cat: 'Decoder Rearrangement' },
+      { rank: 20, id: 'L7_kan_after_aspp', desc: 'KAN Block After ASPP', params: '11,036,919', rmse: '3.535 K', gain: '-0.44%', cat: 'Bottleneck Rearrangement' }
     ];
 
     function populateTable() {
@@ -742,3 +750,4 @@
   </script>
 </body>
 </html>
+

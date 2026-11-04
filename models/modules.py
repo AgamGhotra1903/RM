@@ -17,7 +17,10 @@ All blocks adhere strictly to:
 """
 
 import tensorflow as tf
-from tensorflow.keras.layers import Layer, LayerNormalization, Dense, Dropout, Conv3D, BatchNormalization, Activation
+from tensorflow.keras.layers import (
+    Layer, LayerNormalization, Dense, Dropout, Conv3D, BatchNormalization, Activation,
+    GlobalAveragePooling3D
+)
 
 class AnchorResidualBroadcast(Layer):
     """
@@ -292,4 +295,36 @@ class Conv3DControlBlock(Layer):
     def get_config(self):
         config = super().get_config()
         config.update({"channels": self.channels})
+        return config
+
+
+class SpatioTemporalSEBlock(Layer):
+    """
+    Spatio-Temporal Squeeze-and-Excitation Block for 3D convolutional features.
+    Squeezes (B, D, H, W, C) via GlobalAveragePooling3D into (B, C),
+    processes through two Dense layers with bottleneck reduction ratio r=4,
+    and excites channel activations via sigmoid scaling.
+    """
+    def __init__(self, channels: int, reduction: int = 4, **kwargs):
+        super().__init__(**kwargs)
+        self.channels = channels
+        self.reduction = reduction
+        hidden_dim = max(4, channels // reduction)
+        self.pool = GlobalAveragePooling3D()
+        self.fc1 = Dense(hidden_dim, activation="relu", kernel_initializer="glorot_uniform", name="se_fc1")
+        self.fc2 = Dense(channels, activation="sigmoid", kernel_initializer="glorot_uniform", name="se_fc2")
+
+    def call(self, inputs):
+        s = self.pool(inputs)
+        s = self.fc1(s)
+        s = self.fc2(s)
+        s = tf.reshape(s, [-1, 1, 1, 1, self.channels])
+        return inputs * s
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            "channels": self.channels,
+            "reduction": self.reduction
+        })
         return config

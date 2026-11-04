@@ -39,7 +39,8 @@ from models.broad_unet import build_broad_unet
 from models.rearranged_models import build_rearranged_model, EXPERIMENT_NAMES
 from models.activation_models import build_broad_unet_with_activation, ACTIVATION_DESCRIPTIONS
 from models.hybrid_model import build_hybrid_kan_leaky_relu
-from models.modules import SkipFusionBlock, KANBlock, MLPBlock
+from models.next_gen_models import build_next_gen_model
+from models.modules import SkipFusionBlock, KANBlock, MLPBlock, SpatioTemporalSEBlock
 
 MODELS_CATALOG = {
     "basic": {
@@ -221,13 +222,57 @@ MODELS_CATALOG = {
     "L15": {
         "name": "L15_hybrid_kan_leaky_relu",
         "builder": lambda: build_hybrid_kan_leaky_relu(lags=6, latitude=32, longitude=48, features=10, features_output=7, filters=16),
-        "desc": "CHAMPION MODEL: KAN Skip Fusion (merge6 & merge7) + LeakyReLU (alpha=0.2) backbone.",
-        "category": "Overall Champion (Rank 1 / 16)",
+        "desc": "Hybrid Synthesis: KAN Skip Fusion (merge6 & merge7) + LeakyReLU (alpha=0.2) backbone.",
+        "category": "Tournament Hybrid (Rank 4 / 20)",
         "has_anchor": True,
         "skip_type": "kan_fusion",
         "activation": "LeakyReLU (0.2)",
         "params": 10254583,
         "val_rmse": "3.369 K"
+    },
+    "L16": {
+        "name": "L16_full_hierarchy_kan_skips",
+        "builder": lambda: build_next_gen_model("L16_full_hierarchy_kan_skips", lags=6, latitude=32, longitude=48, features=10, features_output=7, filters=16),
+        "desc": "Full-Hierarchy 4-Stage KAN Skip Fusion across merges 6, 7, 8, 9 down to full spatial resolution.",
+        "category": "Next-Gen Skip Hierarchy",
+        "has_anchor": True,
+        "skip_type": "kan_fusion",
+        "activation": "LeakyReLU (0.2)",
+        "params": 10230455,
+        "val_rmse": "3.507 K"
+    },
+    "L17": {
+        "name": "L17_decoupled_diurnal_synoptic_heads",
+        "builder": lambda: build_next_gen_model("L17_decoupled_diurnal_synoptic_heads", lags=6, latitude=32, longitude=48, features=10, features_output=7, filters=16),
+        "desc": "APEX CHAMPION: Decoupled Diurnal (Tanh, +2h..+16h) and Synoptic (Linear, +24h..+72h) heads + KAN Skips.",
+        "category": "Apex Champion (Rank 1 / 20)",
+        "has_anchor": True,
+        "skip_type": "kan_fusion",
+        "activation": "LeakyReLU (0.2)",
+        "params": 10254583,
+        "val_rmse": "3.211 K"
+    },
+    "L18": {
+        "name": "L18_spatiotemporal_se_multiscale",
+        "builder": lambda: build_next_gen_model("L18_spatiotemporal_se_multiscale", lags=6, latitude=32, longitude=48, features=10, features_output=7, filters=16),
+        "desc": "Spatio-Temporal Squeeze-and-Excitation (ST-SE) channel attention inside MultiScale Conv3D blocks.",
+        "category": "Next-Gen Channel Attention (Rank 3 / 20)",
+        "has_anchor": True,
+        "skip_type": "naive_concat",
+        "activation": "LeakyReLU (0.2)",
+        "params": 10310031,
+        "val_rmse": "3.318 K"
+    },
+    "L19": {
+        "name": "L19_apex_hybrid_kan_se_decoupled",
+        "builder": lambda: build_next_gen_model("L19_apex_hybrid_kan_se_decoupled", lags=6, latitude=32, longitude=48, features=10, features_output=7, filters=16),
+        "desc": "APEX SYNTHESIS: Full KAN Skips + ST-SE Attention + Decoupled Diurnal/Synoptic Heads + LeakyReLU.",
+        "category": "Apex Synthesis (Rank 2 / 20)",
+        "has_anchor": True,
+        "skip_type": "kan_fusion",
+        "activation": "LeakyReLU (0.2)",
+        "params": 10285903,
+        "val_rmse": "3.241 K"
     },
     "act_tanh": {
         "name": "Broad-UNet with Tanh Backbone",

@@ -1,0 +1,10 @@
+batch_size: 4
+category: Apex Next-Gen Synthesis
+epochs: 2
+eval_samples: 160
+exp_id: L19_apex_hybrid_kan_se_decoupled
+learning_rate: 0.0003
+name: 'APEX HYBRID: Full KAN + ST-SE + Decoupled Heads'
+params: 10285903
+steps_per_epoch: 10
+val_steps: 3

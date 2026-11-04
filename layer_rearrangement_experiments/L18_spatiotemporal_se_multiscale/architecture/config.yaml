@@ -1,0 +1,10 @@
+batch_size: 4
+category: Attention & Channel Recalibration
+epochs: 2
+eval_samples: 160
+exp_id: L18_spatiotemporal_se_multiscale
+learning_rate: 0.0003
+name: Spatio-Temporal Squeeze-and-Excitation
+params: 10310031
+steps_per_epoch: 10
+val_steps: 3

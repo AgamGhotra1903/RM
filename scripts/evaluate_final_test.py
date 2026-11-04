@@ -44,6 +44,12 @@ def get_model(exp_id: str):
             lags=6, latitude=32, longitude=48, features=10, features_output=7,
             filters=16, dropout=0.2, residual_head=True
         )
+    elif exp_id.startswith("L16") or exp_id.startswith("L17") or exp_id.startswith("L18") or exp_id.startswith("L19"):
+        from models.next_gen_models import build_next_gen_model
+        return build_next_gen_model(
+            exp_id, lags=6, latitude=32, longitude=48, features=10, features_output=7,
+            filters=16, dropout=0.2, seed=42
+        )
     elif exp_id.startswith("act_"):
         from models.activation_models import build_broad_unet_with_activation
         act = exp_id.replace("act_", "")
